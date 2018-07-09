@@ -1,25 +1,73 @@
-JSNES
-=====
+# JSNES
 
 A JavaScript NES emulator.
 
-Build
------
+It's a library that works in both the browser and Node.js. The browser UI is available at [https://github.com/bfirsh/jsnes-web](https://github.com/bfirsh/jsnes-web).
 
-To build a distribution, you will [Grunt](http://gruntjs.com):
+## Installation
 
-    $ sudo npm install -g grunt-cli
+For Node.js or Webpack:
 
-Then run:
+    $ npm install jsnes
 
-    $ npm install
-    $ grunt
+(Or `yarn add jsnes`.)
 
-This will create ``jsnes.js`` and ``jsnes-min.js`` in ``build/``.
+In the browser, you can use [unpkg](https://unpkg.com):
 
-Benchmark
----------
+```html
+<script type="text/javascript" src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
+```
 
-The benchmark in ``test/benchmark.js`` is intended for testing JavaScript 
-engines. It does not depend on a DOM or Canvas element etc.
+## Usage
 
+```javascript
+// Initialize and set up outputs
+var nes = new jsnes.NES({
+  onFrame: function(frameBuffer) {
+    // ... write frameBuffer to screen
+  },
+  onAudioSample: function(left, right) {
+    // ... play audio sample
+  }
+});
+
+// Read ROM data from disk (using Node.js APIs, for the sake of this example)
+const fs = require('fs');
+var romData = fs.readFileSync('path/to/rom.nes', {encoding: 'binary'});
+
+// Load ROM data as a string or byte array
+nes.loadROM(romData);
+
+// Run frames at 60 fps, or as fast as you can.
+// You are responsible for reliable timing as best you can on your platform.
+nes.frame();
+nes.frame();
+// ...
+
+// Hook up whatever input device you have to the controller.
+nes.buttonDown(1, jsnes.Controller.BUTTON_A);
+nes.frame();
+nes.buttonUp(1, jsnes.Controller.BUTTON_A);
+nes.frame();
+// ...
+```
+
+## Build
+
+To build a distribution:
+
+    $ yarn run build
+
+This will create `dist/jsnes.min.js`.
+
+## Running tests
+
+    $ yarn test
+
+## Formatting code
+
+All code must conform to [Prettier](https://prettier.io/) formatting. The test suite won't pass unless it does.
+
+To automatically format all your code, run:
+
+    $ yarn run format
